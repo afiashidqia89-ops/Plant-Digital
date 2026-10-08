@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pemeriksaan Kondisi Blok</title>
   <meta name="theme-color" content="#166534">
-<meta name="cek-blok-build" content="2026-10-08-v17-geopdf-avenza-btn">
+<meta name="cek-blok-build" content="2026-10-08-v18-geopdf-avenza-satu-tombol">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Cek Blok">
@@ -843,7 +843,7 @@ body[data-view="home"] .home-back{display:none!important}
           <div class="peta-tmrow"><label>Dari tanggal<input type="date" id="petaTmFrom"></label><label>Sampai<input type="date" id="petaTmTo"></label><button type="button" class="secondary" id="petaTmReset">Reset filter</button></div>
           <div class="peta-tm-stat" id="petaTmStat"></div>
           <div class="peta-tmrow"><label>Cakupan peta di PDF<select id="petaPdfScope"><option value="view">Tampilan layar saat ini</option><option value="all">Seluruh peta + temuan</option><option value="temuan">Fokus ke area temuan</option></select></label><label class="peta-chk"><input type="checkbox" id="petaPdfPhoto" checked> Sertakan foto di daftar temuan</label></div>
-          <div class="peta-tmrow"><button type="button" class="primary" id="petaPdfBtn">📄 Ekspor PDF Peta</button><button type="button" class="primary" id="petaGeoPdfBtn">🧭 Ekspor GeoPDF (Avenza)</button><button type="button" class="secondary" id="petaTmFit">🎯 Zoom ke Temuan</button></div>
+          <div class="peta-tmrow"><button type="button" class="primary" id="petaPdfBtn">🧭 Ekspor PDF Peta (siap Avenza)</button><button type="button" class="secondary" id="petaTmFit">🎯 Zoom ke Temuan</button></div>
         </div>
         <div class="peta-layers" id="petaLayers"></div>
         <div class="peta-msg" id="petaMsg"></div>
@@ -2446,7 +2446,7 @@ function buildPdf(pages,geo){
  const catalog=reserve(),pagesId=reserve(),info=reserve(),refs=pages.map(()=>({page:reserve(),content:reserve(),image:reserve()}));let vp=0,measure=0,gcs=0;if(geo){vp=reserve();measure=reserve();gcs=reserve()}const PW=841.89,PH=595.28;
  push('%PDF-1.7\n');write(catalog,`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);write(pagesId,`<< /Type /Pages /Kids [${refs.map(r=>r.page+' 0 R').join(' ')}] /Count ${refs.length} >>`);write(info,'<< /Title (Cek Blok GeoPDF) /Producer (Cek Blok WGS84) >>');
  refs.forEach((r,i)=>{write(r.page,`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im0 ${r.image} 0 R >> >> /Contents ${r.content} 0 R${geo&&i===0?` /VP [${vp} 0 R]`:''} >>`);const c=`q ${PW} 0 0 ${PH} 0 0 cm /Im0 Do Q`;write(r.content,`<< /Length ${c.length} >>\nstream\n${c}\nendstream`);offs[r.image]=off;push(`${r.image} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${pages[i].w} /Height ${pages[i].h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${pages[i].bytes.length} >>\nstream\n`);push(pages[i].bytes);push('\nendstream\nendobj\n')});
- if(geo){const bb=geo.bbox.map(pdfNum).join(' '),lp=geo.lpts.join(' '),gp=geo.gpts.map(pdfNum).join(' ');write(gcs,'<< /Type /GEOGCS /EPSG 4326 /WKT (GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]) >>');write(measure,`<< /Type /Measure /Subtype /GEO /Bounds [${lp}] /LPTS [${lp}] /GPTS [${gp}] /GCS ${gcs} 0 R /DCS ${gcs} 0 R >>`);write(vp,`<< /Type /Viewport /BBox [${bb}] /Name (Cek Blok WGS84) /Measure ${measure} 0 R >>`)}
+ if(geo){const bb=geo.bbox.map(pdfNum).join(' '),lp=geo.lpts.join(' '),gp=geo.gpts.map(pdfNum).join(' ');write(gcs,'<< /Type /GEOGCS /EPSG 4326 /WKT (GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]) >>');write(measure,`<< /Type /Measure /Subtype /GEO /Bounds [${lp}] /LPTS [${lp}] /GPTS [${gp}] /GCS ${gcs} 0 R >>`);write(vp,`<< /Type /Viewport /BBox [${bb}] /Name (Cek Blok WGS84) /Measure ${measure} 0 R >>`)}
  const total=next,xp=off;let x='xref\n0 '+total+'\n0000000000 65535 f \n';for(let i=1;i<total;i++)x+=String(offs[i]).padStart(10,'0')+' 00000 n \n';push(x);push(`trailer\n<< /Size ${total} /Root ${catalog} 0 R /Info ${info} 0 R >>\nstartxref\n${xp}\n%%EOF`);return new Blob(chunks,{type:'application/pdf'})
 }
 function clipText(c,t,maxW){ t=String(t==null?'':t); if(c.measureText(t).width<=maxW) return t; while(t.length>1&&c.measureText(t+'…').width>maxW) t=t.slice(0,-1); return t+'…'; }
@@ -2465,7 +2465,7 @@ function drawHeader(c,title,sub){
   c.font='400 19px Segoe UI,Arial,sans-serif'; c.fillStyle='#d1fae5'; c.fillText(clipText(c,sub,PGW-80),40,68);
 }
 async function exportPdf(geoMode=false){
-  const btn=$(geoMode?'petaGeoPdfBtn':'petaPdfBtn'), lbl=btn.textContent;
+  const btn=$('petaPdfBtn'), lbl=btn.textContent;
   const L=temuanSorted(true);
   if(!L.length){ msg('Tidak ada titik temuan untuk dicetak (periksa filter jenis/tanggal).',true); return; }
   btn.disabled=true; btn.textContent=geoMode?'Menyiapkan GeoPDF...':'Menyiapkan PDF...'; msg(geoMode?'Membuat GeoPDF untuk Avenza...':'Membuat PDF peta...');
@@ -2559,8 +2559,7 @@ $('petaTmChips').addEventListener('change',e=>{ if(e.target.id!=='petaTmSelect')
 $('petaTmFrom').addEventListener('input',e=>{ tFilter.from=e.target.value; tmChanged(); });
 $('petaTmTo').addEventListener('input',e=>{ tFilter.to=e.target.value; tmChanged(); });
 $('petaTmReset').addEventListener('click',()=>{ tFilter.from=tFilter.to=''; $('petaTmFrom').value=''; $('petaTmTo').value=''; tFilter.hidden.clear(); tmChanged(); const dd=$('petaTmSelect'); if(dd) dd.value='all'; });
-$('petaPdfBtn').addEventListener('click',()=>exportPdf(false));
-$('petaGeoPdfBtn').addEventListener('click',()=>exportPdf(true));
+$('petaPdfBtn').addEventListener('click',()=>exportPdf(true));
 $('petaTmFit').addEventListener('click',()=>{ const b=temuanBounds(temuanList(true)); if(!b){ msg('Belum ada titik temuan.',true); return; } const v=viewFor(b,W,H,1.5,0.0008*cos0); view.cx=v.cx; view.cy=v.cy; view.k=v.k; dirty=true; });
 refreshTemuanUI();
 
